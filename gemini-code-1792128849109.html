@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="lo" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BB2 - ຊື້ຂາຍໄອດີ & ເວັບເຕີມເກມ Free Fire</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans Lao', sans-serif; }
+        @keyframes popUp {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPTbYw21gO_7ywFMiAKnYbniTZQLh2ows",
+            authDomain: "bb2s-fca83.firebaseapp.com",
+            projectId: "bb2s-fca83",
+            storageBucket: "bb2s-fca83.firebasestorage.app",
+            messagingSenderId: "241844559046",
+            appId: "1:241844559046:web:bd8480779488bb3d288bc7",
+            measurementId: "G-GMXTD8RW9P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.where = where;
+
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+</head>
+<body class="bg-[#121318] text-gray-100 min-h-screen pb-24 selection:bg-red-600 selection:text-white relative">
+
+    <!-- 1. Header Bar -->
+    <header class="bg-[#1a1c23] border-b border-gray-800 sticky top-0 z-20 px-3 py-2.5 flex justify-between items-center">
+        <div class="flex items-center gap-1 cursor-pointer" onclick="switchTab('home')">
+            <span class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
+                🎮 BB2
+            </span>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+            <button onclick="openAdminLoginModal()" class="bg-gray-800 hover:bg-gray-700 text-[11px] text-yellow-400 font-bold px-2 py-1.5 rounded-lg border border-yellow-500/30 transition">
+                ⚙️ Admin
+            </button>
+
+            <div id="user-auth-container" class="hidden items-center gap-1.5 bg-[#252833] px-2.5 py-1 rounded-full border border-gray-700">
+                <span id="user-credit" class="text-xs font-bold text-red-500">0 ₭</span>
+                <div class="relative cursor-pointer" onclick="switchTab('profile')">
+                    <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-6 h-6 rounded-full bg-red-600">
+                </div>
+            </div>
+            
+            <div id="guest-auth-buttons" class="flex items-center gap-1.5">
+                <button onclick="openLoginModal()" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition shadow-md">
+                    ເຂົ້າສູ່ລະບົບ
+                </button>
+                <button onclick="openRegisterModal()" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition shadow-md">
+                    ສະໝັກ
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Home View -->
+    <main id="homeView" class="max-w-2xl mx-auto px-4 py-6 space-y-8 animate-pop">
+        <section>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-yellow-500 text-xl">🛒</span>
+                <h2 class="text-lg font-bold text-white">ບ່ອນຊື້ຂາຍໄອດີເກມ (Roblox & Free Fire)</h2>
+            </div>
+            <div id="market-account-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-[#1a1c23] rounded-2xl p-6 border border-gray-800 text-center space-y-2 shadow-xl col-span-full">
+                    <div class="text-3xl">📭</div>
+                    <p class="text-sm font-bold text-gray-300">ຕອນນີ້ຍັງບໍ່ມີສິນຄ້າເຂົ້າ</p>
+                    <p class="text-xs text-gray-500">ກະລຸນາຕິດຕາມກວດສອບໃໝ່ພາຍຫຼັງ</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-red-500 text-xl">🔥</span>
+                <h2 class="text-lg font-bold text-white">ເກມທີ່ໄດ້ຮັບຄວາມນິຍົມ</h2>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-[#1a1c23] rounded-2xl p-2 border border-gray-800 relative flex flex-col justify-between hover:border-red-500/50 transition shadow-xl">
+                    <span class="absolute top-1 right-1 bg-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded text-white shadow">HOT</span>
+                    <img src="ຟີຟາຍ.png" alt="Free Fire" class="w-full h-28 object-cover rounded-xl mb-2" onerror="this.src='https://via.placeholder.com/150/1e293b/ffffff?text=Free+Fire'">
+                    <button onclick="showTopupPage()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-xl transition">ເຕີມເກມ</button>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-green-500 text-xl">📞</span>
+                <h2 class="text-lg font-bold text-white">ຕິດຕໍ່ແອດມິນ</h2>
+            </div>
+            <div class="bg-[#1a1c23] rounded-2xl p-4 border border-gray-800 text-center space-y-3 shadow-xl">
+                <p class="text-sm text-gray-300">ມີບັນຫາໃນການເຕີມເງິນ ຫຼື ຊື້ໄອດີ ຕິດຕໍ່ໄດ້ທີ່:</p>
+                <p class="text-lg font-bold text-green-400">ເບີໂທລະສັບ: 2098203465</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 3. Topup Detail View -->
+    <main id="topupView" class="max-w-2xl mx-auto px-4 py-6 hidden animate-pop space-y-6">
+        <button onclick="switchTab('home')" class="text-xs text-gray-400 hover:text-white flex items-center gap-1 mb-2 font-bold">&larr; ກັບຄືນໜ້າຫຼັກ</button>
+        <div class="bg-[#1a1c23] rounded-3xl p-6 border border-gray-800 text-center flex flex-col items-center justify-center relative overflow-hidden shadow-xl">
+            <img src="ຟີຟາຍ.png" alt="Free Fire" class="w-24 h-24 object-cover rounded-2xl mb-3 shadow-lg" onerror="this.src='https://via.placeholder.com/150/1e293b/ffffff?text=Free+Fire'">
+            <h1 class="text-xl font-bold text-cyan-400">Free Fire ລາວ-ໄທ</h1>
+        </div>
+
+        <div class="bg-[#1a1c23] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-xl">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                <h2 class="font-bold text-white text-base">ຂໍ້ມູນຜູ້ຫຼິ້ນ</h2>
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-2">ໄອດີ່ເກມ</label>
+                <input type="text" id="game-id" placeholder="ໄອດີ່ເກມ" class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
+            </div>
+        </div>
+
+        <div class="bg-[#1a1c23] rounded-3xl p-5 border border-gray-800 space-y-5 shadow-xl">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center">2</span>
+                <h2 class="font-bold text-white text-base">ເລືອກແພັກເກັດ</h2>
+            </div>
+
+            <!-- 1. ບໍລິການເພັດຟີຟາຍ 💎 -->
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-cyan-400">📌 ບໍລິການເພັດຟີຟາຍ 💎</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div onclick="selectPackage(this, '33 ເພັດ (6,867 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 33 = <span class="text-green-400">6,867 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '68 ເພັດ (13,734 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 68 = <span class="text-green-400">13,734 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '101 ເພັດ (20,900 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 101 = <span class="text-green-400">20,900 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '172 ເພັດ (33,000 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 172 = <span class="text-green-400">33,000 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '310 ເພັດ (60,000 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 310 = <span class="text-green-400">60,000 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '517 ເພັດ (99,000 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 517 = <span class="text-green-400">99,000 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '690 ເພັດ (131,872 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 690 = <span class="text-green-400">131,872 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '1052 ເພັດ (197,900 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 1052 = <span class="text-green-400">197,900 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '1800 ເພັດ (346,448 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 1800 = <span class="text-green-400">346,448 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, '3698 ເພັດ (664,895 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-cyan-400 font-bold">💎 3698 = <span class="text-green-400">664,895 ₭</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ແພັກເກັດພິເສດ 🎁 -->
+            <div class="space-y-2 pt-2">
+                <h3 class="text-xs font-bold text-yellow-400">🎁 ແພັກເກັດພິເສດ</h3>
+                <div class="grid grid-cols-1 gap-2.5 text-xs">
+                    <div onclick="selectPackage(this, 'ແພັກເລີ່ມຕົ້ນ 100💎 (6,989 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-yellow-400 font-bold">🎁 ແພັກເລີ່ມຕົ້ນ ໄດ້ຮັບ 100💎 = <span class="text-green-400">6,989 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'ຫຼາຍອາທິດມິນິ 200💎 (22,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-yellow-400 font-bold">📅 ຫຼາຍອາທິດມິນິຮັບທັງໝົດ 200💎 = <span class="text-green-400">22,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'ຫຼາຍອາທິດ (44,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-yellow-400 font-bold">📅 ຫຼາຍອາທິດ = <span class="text-green-400">44,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'ຫຼາຍເດືອນ (199,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-yellow-400 font-bold">🗓️ ຫຼາຍເດືອນ = <span class="text-green-400">199,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'ລວມຮັບທັງໝົດ 2000 ປາຍ ບູຢ່າພາສ (61,000 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-yellow-400 font-bold">📦 ລວມຮັບທັງໝົດ 2000 ປາຍ ບູຢ່າພາສ = <span class="text-green-400">61,000 ₭</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ແພັກເກັດເຕີບໂຕ-ເລເວວ 📈 -->
+            <div class="space-y-2 pt-2">
+                <h3 class="text-xs font-bold text-purple-400">📈 ແພັກເຕີບໂຕ-ເລເວວ</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div onclick="selectPackage(this, 'Lv. 6 (5,000 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 6 = <span class="text-green-400">5,000 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'Lv. 10 (11,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 10 = <span class="text-green-400">11,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'Lv. 15 (11,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 15 = <span class="text-green-400">11,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'Lv. 20 (11,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 20 = <span class="text-green-400">11,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'Lv. 25 (11,999 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 25 = <span class="text-green-400">11,999 ₭</span></span>
+                    </div>
+                    <div onclick="selectPackage(this, 'Lv. 30 (16,900 ₭)')" class="package-card bg-[#252833] border border-gray-700 rounded-2xl p-3 cursor-pointer hover:border-red-500 flex justify-between items-center transition">
+                        <span class="text-purple-400 font-bold">📈 Lv. 30 = <span class="text-green-400">16,900 ₭</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="validateAndSubmitTopup()" class="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 rounded-xl mt-4 transition duration-150 shadow-lg text-xs">
+                ຢືນຢັນການເຕີມເກມ
+            </button>
+        </div>
+    </main>
+
+    <!-- 4. History View -->
+    <main id="historyView" class="max-w-2xl mx-auto px-4 py-6 hidden animate-pop space-y-4">
+        <h2 class="text-xl font-bold text-white mb-4">🕒 ປະຫວັດການເຮັດຸລະກຳ</h2>
+        <div class="bg-[#1a1c23] border border-gray-800 rounded-2xl overflow-hidden shadow-xl p-4">
+            <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-[#21242e] text-gray-200 border-b border-gray-800 font-bold">
+                    <tr>
+                        <th class="py-2 px-2">ສະຖານະ</th>
+                        <th class="py-2 px-2">ໄອດີ້ເກມ</th>
+                        <th class="py-2 px-2">ແພັກເກັດ</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody" class="divide-y divide-gray-800/60"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- 5. Profile View -->
+    <main id="profileView" class="max-w-md mx-auto hidden animate-pop space-y-6 pb-6">
+        <div class="relative w-full h-36 bg-gradient-to-r from-red-900 via-purple-900 to-indigo-900 rounded-b-3xl overflow-hidden shadow-xl flex items-center justify-center">
+            <span class="text-3xl font-bold">🎮 BB2 STORE</span>
+        </div>
+        <div class="text-center -mt-16 px-4 relative z-10">
+            <img id="profile-page-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Profile" class="w-24 h-24 rounded-full border-4 border-[#121318] bg-[#1a1c23] object-cover shadow-2xl mx-auto">
+            <h2 id="profile-page-handle" class="text-lg font-bold text-white mt-2">@user</h2>
+        </div>
+        <div class="px-4">
+            <div class="bg-[#1a1c23] border border-gray-800 rounded-2xl overflow-hidden shadow-xl divide-y divide-gray-800/80 text-xs sm:text-sm">
+                <div class="p-3.5 flex justify-between items-center"><span class="text-gray-400">📧 ອີເມວ</span><span id="profile-email-val" class="font-bold text-gray-200">user@bb2.com</span></div>
+                <div class="p-3.5 flex justify-between items-center"><span class="text-gray-400">👛 ຍອດເງິນ</span><span id="profile-credit-val" class="font-bold text-emerald-400 text-sm">0 ₭</span></div>
+            </div>
+        </div>
+        <div class="px-4">
+            <button id="admin-panel-btn" onclick="showAdminPage()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-2xl text-xs shadow-lg">🛡️ ໄປໜ້າ Admin Panel</button>
+        </div>
+        <div class="px-4">
+            <button onclick="logout()" class="w-full bg-red-900/45 hover:bg-red-900/60 text-red-400 font-bold py-3 rounded-2xl text-xs transition">ອອກຈາກລະບົບ</button>
+        </div>
+    </main>
+
+    <!-- 6. Admin Panel View -->
+    <main id="adminPanelView" class="max-w-2xl mx-auto px-4 py-6 hidden animate-pop space-y-6">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+            <h2 class="text-lg font-bold text-yellow-400 flex items-center gap-2">🛡️ BB2 Admin Panel</h2>
+            <button onclick="switchTab('home')" class="text-xs bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg">ອອກຈາກ Admin</button>
+        </div>
+
+        <div class="bg-[#1a1c23] border border-yellow-600/30 rounded-3xl p-5 shadow-xl space-y-4">
+            <h3 class="text-sm font-bold text-yellow-400">🛒 ເພີ່ມໄອດີເກມລົງຂາຍ (Roblox / Free Fire)</h3>
+            <div class="space-y-3">
+                <select id="adminGameType" class="w-full bg-[#121318] border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white">
+                    <option value="Free Fire">🔥 Free Fire</option>
+                    <option value="Roblox">🤖 Roblox</option>
+                </select>
+                <input type="text" id="adminAccountTitle" placeholder="ຊື່/ລາຍລະອຽດໄອດີ" class="w-full bg-[#121318] border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white">
+                <input type="number" id="adminAccountPrice" placeholder="ລາຄາ (₭)" class="w-full bg-[#121318] border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white">
+                <input type="file" id="adminAccountImgFile" accept="image/*" class="w-full bg-[#121318] border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-300">
+                <button onclick="adminPostAccount()" class="w-full bg-yellow-600 text-white font-bold py-2.5 rounded-xl text-xs">ໂພສຂາຍໄອດີລົງໜ້າເວັບ</button>
+            </div>
+        </div>
+
+        <div class="bg-[#1a1c23] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-xl">
+            <h3 class="font-bold text-pink-500 text-sm">📋 ລາຍການລໍຖ້າການກວດສອບ (ສະລິບ & ບັດເຕີມເງິນ)</h3>
+            <div id="admin-slip-list" class="space-y-3 text-xs"></div>
+        </div>
+    </main>
+
+    <!-- 7. Top-Up Credit Selection View -->
+    <main id="topupCreditView" class="max-w-2xl mx-auto px-4 py-6 hidden animate-pop space-y-6">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="text-pink-500 text-2xl">👛</span>
+            <h2 class="text-xl font-bold text-white">ຊ່ອງທາງເຕີມເຄຣດິດ</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- BCEL QR -->
+            <div class="bg-[#1a1c23] rounded-2xl p-4 border border-gray-800 text-center flex flex-col justify-between shadow-xl space-y-3">
+                <div>
+                    <p class="font-bold text-red-500 mb-1">BCEL One QR</p>
+                    <p class="text-[11px] text-gray-400">* ສະແກນ QR ໂອນເງິນ & ອັບໂຫຼດສະລິບ</p>
+                </div>
+                <button onclick="openQrModal()" class="w-full bg-red-600 text-white text-xs font-bold py-2.5 rounded-xl">ເຕີມດ້ວຍ QR</button>
+            </div>
+            <!-- Lao Telecom Card -->
+            <div class="bg-[#1a1c23] rounded-2xl p-4 border border-gray-800 text-center flex flex-col justify-between shadow-xl space-y-3">
+                <div>
+                    <p class="font-bold text-yellow-400 mb-1">ບັດເຕີມເງິນ (Lao Telecom)</p>
+                    <p class="text-[11px] text-gray-400">* ຫັກຄ່າທຳນຽມ ຮັບເງິນ 6,500 ₭</p>
+                </div>
+                <button onclick="openCardModal()" class="w-full bg-yellow-600 text-white text-xs font-bold py-2.5 rounded-xl">ເຕີມດ້ວຍບັດ</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#1a1c23] border-t border-gray-800 px-6 py-2 z-10">
+        <div class="max-w-md mx-auto flex justify-between items-center text-gray-400">
+            <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 text-pink-500"><span class="text-lg">🎮</span><span class="text-[10px] font-bold">ເຕີມເກມ</span></button>
+            <button onclick="switchTab('history')" class="flex flex-col items-center gap-1"><span class="text-lg">🕒</span><span class="text-[10px] font-bold">ປະຫວັດ</span></button>
+            <button onclick="switchTab('topupCredit')" class="flex flex-col items-center gap-1"><span class="text-lg">👛</span><span class="text-[10px] font-bold">ເຕີມເຄຣດິດ</span></button>
+            <button onclick="handleProfileClick()" class="flex flex-col items-center gap-1"><span class="text-lg">👤</span><span class="text-[10px] font-bold">ໂປຣໄຟລ໌</span></button>
+        </div>
+    </nav>
+
+    <!-- Modal: QR Code + Upload Slip -->
+    <div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-gray-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 text-lg font-bold">&times;</button>
+            <h3 class="text-lg font-bold text-red-500">BCEL One QR</h3>
+            <div class="bg-white p-3 rounded-2xl inline-block shadow">
+                <img src="qr.png" alt="BCEL QR Code" class="w-48 h-48 object-contain mx-auto" onerror="this.src='https://via.placeholder.com/200?text=QR+Code+BCEL'">
+            </div>
+            <input type="file" id="slip-file" accept="image/*" class="w-full bg-[#121318] border border-gray-700 rounded-xl p-2 text-xs text-gray-300">
+            <button onclick="submitSlip()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs">ສົ່ງສະລິບໃຫ້ແອດມິນ</button>
+        </div>
+    </div>
+
+    <!-- Modal: Card Topup -->
+    <div id="cardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-gray-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4">
+            <button onclick="closeCardModal()" class="absolute top-4 right-4 text-gray-400 text-lg font-bold">&times;</button>
+            <h3 class="text-lg font-bold text-yellow-400">ເຕີມເງິນດ້ວຍບັດ (Lao Telecom)</h3>
+            <p class="text-xs text-gray-400">ກະລຸນາໃສ່ລະຫັດບັດ (ຮັບເງິນສຸດທິ 6,500 ₭ ຫຼັງຫັກຄ່າທຳນຽມ)</p>
+            <input type="text" id="card-code-input" placeholder="ໃສ່ລະຫັດບັດເຕີມເງິນ..." class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+            <button onclick="submitCard()" class="w-full bg-yellow-600 text-white font-bold py-3 rounded-xl text-xs">ສົ່ງລະຫັດບັດໃຫ້ແອດມິນ</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-yellow-600/50 rounded-3xl max-w-sm w-full p-6 relative">
+            <button onclick="closeAdminLoginModal()" class="absolute top-4 right-4 text-gray-400 text-lg font-bold">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-6 text-yellow-400">⚙️ ເຂົ້າສູ່ລະບົບ Admin</h3>
+            <form class="space-y-4" onsubmit="handleAdminLogin(event)">
+                <input type="text" id="admin-user" placeholder="ຊື່ແອດມິນ" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <input type="password" id="admin-pass" placeholder="ລະຫັດຜ່ານ" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <button type="submit" class="w-full bg-yellow-600 text-white font-bold py-3 rounded-xl text-xs">ເຂົ້າສູ່ລະບົບ Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-gray-800 rounded-3xl max-w-sm w-full p-6 relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 text-lg font-bold">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-6 text-white">ເຂົ້າສູ່ລະບົບ</h3>
+            <form class="space-y-4" onsubmit="handleLogin(event)">
+                <input type="text" id="login-name" placeholder="ຊື່ຜູ້ໃຊ້" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <input type="password" id="login-pass" placeholder="ລະຫັດຜ່ານ" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <button type="submit" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs">ເຂົ້າສູ່ລະບົບ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-gray-800 rounded-3xl max-w-sm w-full p-6 relative">
+            <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 text-lg font-bold">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-6 text-white">ສະໝັກສະມາຊິກ</h3>
+            <form class="space-y-4" onsubmit="handleRegister(event)">
+                <input type="text" id="register-name" placeholder="ຊື່ຜູ້ໃຊ້ (Username)" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <input type="email" id="register-email" placeholder="ອີເມວ (Email)" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <input type="password" id="register-pass" placeholder="ລະຫັດຜ່ານ" required class="w-full bg-[#121318] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
+                <button type="submit" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs">ຢືນຢັນສະໝັກສະມາຊິກ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Alert -->
+    <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4">
+        <div class="bg-[#1d1f27] border border-gray-800 rounded-3xl max-w-xs w-full p-6 text-center space-y-4 shadow-2xl">
+            <h3 id="alert-message" class="text-sm font-bold text-white">ຂໍ້ຄວາມ</h3>
+            <button onclick="closeAlertModal()" class="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs">ຕົກລົງ</button>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('bb2_currentUser')) || null;
+        let isAdminLoggedIn = false;
+        let selectedPackageName = "";
+        let alertCallback = null;
+
+        window.addEventListener('firebase-ready', async () => {
+            updateAuthUI();
+            await loadHistory();
+            await loadAdminSlips();
+            await loadMarketAccounts();
+        });
+
+        function showTopupPage() {
+            if (!currentUser) { showAlert("ກະລຸນາເຂົ້າສູ່ລະບົບກ່ອນ", () => openLoginModal()); }
+            else { switchTab('topup'); }
+        }
+
+        function switchTab(tab) {
+            ['homeView', 'topupView', 'historyView', 'profileView', 'adminPanelView', 'topupCreditView'].forEach(v => {
+                const el = document.getElementById(v);
+                if(el) el.classList.add('hidden');
+            });
+            if (tab === 'home') { document.getElementById('homeView').classList.remove('hidden'); loadMarketAccounts(); }
+            else if (tab === 'topup') document.getElementById('topupView').classList.remove('hidden');
+            else if (tab === 'history') { document.getElementById('historyView').classList.remove('hidden'); loadHistory(); }
+            else if (tab === 'profile') document.getElementById('profileView').classList.remove('hidden');
+            else if (tab === 'adminPanel') { document.getElementById('adminPanelView').classList.remove('hidden'); loadAdminSlips(); }
+            else if (tab === 'topupCredit') document.getElementById('topupCreditView').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+        function openRegisterModal() { document.getElementById('registerModal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.add('hidden'); }
+        function openQrModal() { document.getElementById('qrModal').classList.remove('hidden'); }
+        function closeQrModal() { document.getElementById('qrModal').classList.add('hidden'); }
+        function openCardModal() { document.getElementById('cardModal').classList.remove('hidden'); }
+        function closeCardModal() { document.getElementById('cardModal').classList.add('hidden'); }
+        function openAdminLoginModal() { document.getElementById('adminLoginModal').classList.remove('hidden'); }
+        function closeAdminLoginModal() { document.getElementById('adminLoginModal').classList.add('hidden'); }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-user').value.trim();
+            const pass = document.getElementById('admin-pass').value.trim();
+            if (user === "BB2" && pass === "bbaaee") {
+                isAdminLoggedIn = true;
+                closeAdminLoginModal();
+                switchTab('adminPanel');
+                showAlert("ເຂົ້າສູ່ລະບົບ Admin ສຳເລັດ!");
+            } else {
+                showAlert("ຊື່ ຫຼື ລະຫັດຜ່ານ Admin ບໍ່ຖືກຕ້ອງ!");
+            }
+        }
+
+        function showAdminPage() {
+            if (!isAdminLoggedIn) { openAdminLoginModal(); }
+            else { switchTab('adminPanel'); }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-pass').value.trim();
+
+            try {
+                const q = window.query(window.collection(window.db, "users"), window.where("username", "==", username));
+                const querySnapshot = await window.getDocs(q);
+                if (!querySnapshot.empty) {
+                    showAlert("ຊື່ຜູ້ໃຊ້ນี้ມີຄົນໃຊ້ແລ້ວ ກະລຸນາໃຊ້ຊື່ສຳຮອງອື່ນ!");
+                    return;
+                }
+
+                await window.addDoc(window.collection(window.db, "users"), {
+                    username: username,
+                    email: email,
+                    password: password,
+                    credit: 0,
+                    createdAt: Date.now()
+                });
+
+                closeRegisterModal();
+                showAlert("ສະໝັກສະມາຊິກສຳເລັດ! ກະລຸນາເຂົ້າສູ່ລະບົບ", () => {
+                    openLoginModal();
+                });
+            } catch(err) {
+                showAlert("ເກີດຄວາມຜິດພາດ: " + err.message);
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-name').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
+
+            try {
+                const q = window.query(
+                    window.collection(window.db, "users"), 
+                    window.where("username", "==", username),
+                    window.where("password", "==", password)
+                );
+                const querySnapshot = await window.getDocs(q);
+
+                if (querySnapshot.empty) {
+                    showAlert("ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!");
+                    return;
+                }
+
+                let userData = null;
+                querySnapshot.forEach((doc) => {
+                    userData = doc.data();
+                });
+
+                currentUser = { 
+                    username: userData.username, 
+                    email: userData.email, 
+                    credit: userData.credit || 0 
+                };
+                
+                localStorage.setItem('bb2_currentUser', JSON.stringify(currentUser));
+                closeLoginModal();
+                updateAuthUI();
+                showAlert("ເຂົ້າສູ່ລະບົບສຳເລັດ!");
+            } catch(err) {
+                showAlert("ເກີດຄວາມຜິດພາດ: " + err.message);
+            }
+        }
+
+        async function submitSlip() {
+            const slipFile = document.getElementById('slip-file').files[0];
+            if (!slipFile) { showAlert("ກະລຸນາເລືອກຮູບສະລິບ!"); return; }
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(slipFile);
+            reader.onload = async function () {
+                try {
+                    await window.addDoc(window.collection(window.db, "slips"), {
+                        username: currentUser ? currentUser.username : (localStorage.getItem('bb2_currentUser') ? JSON.parse(localStorage.getItem('bb2_currentUser')).username : 'guest'),
+                        type: 'qr',
+                        amount: 50000,
+                        fileUrl: reader.result,
+                        status: 'ລໍຖ້າກວດສອບ',
+                        createdAt: Date.now()
+                    });
+                    closeQrModal();
+                    document.getElementById('slip-file').value = '';
+                    showAlert("ສົ່ງສະລິບໃຫ້ແອດມິນກວດສອບສຳເລັດ!");
+                    loadAdminSlips();
+                } catch(e) { showAlert("Error: " + e.message); }
+            };
+        }
+
+        async function submitCard() {
+            const cardCode = document.getElementById('card-code-input').value.trim();
+            if (!cardCode) { showAlert("ກະລຸນາໃສ່ລະຫັດບັດ!"); return; }
+
+            try {
+                let currentLoginUser = currentUser ? currentUser.username : (localStorage.getItem('bb2_currentUser') ? JSON.parse(localStorage.getItem('bb2_currentUser')).username : 'guest');
+                
+                await window.addDoc(window.collection(window.db, "slips"), {
+                    username: currentLoginUser,
+                    type: 'card',
+                    cardCode: cardCode,
+                    amount: 6500,
+                    status: 'ລໍຖ້າກວດສອບ',
+                    createdAt: Date.now()
+                });
+                closeCardModal();
+                document.getElementById('card-code-input').value = '';
+                showAlert("ສົ່ງລະຫັດບັດໃຫ້ແອດມິນກວດສອບສຳເລັດ!");
+                loadAdminSlips();
+            } catch(e) { showAlert("Error: " + e.message); }
+        }
+
+        async function loadAdminSlips() {
+            const container = document.getElementById('admin-slip-list');
+            if(!container) return;
+            container.innerHTML = "";
+            try {
+                const snap = await window.getDocs(window.collection(window.db, "slips"));
+                if(snap.empty) {
+                    container.innerHTML = `<p class="text-xs text-gray-500">ບໍ່ມີລາຍການລໍຖ້າກວດສອບ</p>`;
+                    return;
+                }
+                snap.forEach(d => {
+                    let item = d.data();
+                    let id = d.id;
+                    let titleText = item.type === 'card' ? `ບັດ Lao Telecom (ຮັບ 6,500 ₭)` : `BCEL QR (${item.amount || 50000} ₭)`;
+                    container.innerHTML += `
+                        <div class="bg-[#252833] p-4 rounded-xl border border-gray-700 space-y-3">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-yellow-400 text-sm">${titleText}</span>
+                                <span class="text-yellow-500">${item.status}</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400">ຜູ້ໃຊ້: ${item.username} ${item.cardCode ? '| ລະຫັດບັດ: ' + item.cardCode : ''}</p>
+                            ${item.fileUrl ? `<img src="${item.fileUrl}" class="w-24 h-24 object-cover rounded-lg border border-gray-700">` : ''}
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="processAction('${id}', 'approve', ${item.amount || 6500}, '${item.username}')" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg text-xs transition">ອະນຸມັດ (+${item.amount || 6500} ₭)</button>
+                                <button onclick="processAction('${id}', 'reject', 0, '${item.username}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs transition">ປະຕິເສດ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) {}
+        }
+
+        async function processAction(id, action, amount, targetUsername) {
+            try {
+                if(action === 'approve') {
+                    // ອັບເດດສະຖານະໃນ slips
+                    await window.updateDoc(window.doc(window.db, "slips", id), { status: 'ອະນຸມັດແລ້ວ' });
+
+                    // ຄົ້ນຫາ User ໃນ Firestore ເเพื่อບວກຍອດເງິນເພີ່ມ
+                    if (targetUsername && targetUsername !== 'guest') {
+                        const userQuery = window.query(window.collection(window.db, "users"), window.where("username", "==", targetUsername));
+                        const userSnap = await window.getDocs(userQuery);
+                        
+                        if (!userSnap.empty) {
+                            userSnap.forEach(async (userDoc) => {
+                                let uData = userDoc.data();
+                                let newCredit = (uData.credit || 0) + amount;
+                                await window.updateDoc(window.doc(window.db, "users", userDoc.id), { credit: newCredit });
+
+                                // ຖ້າ User ທີ່ກຳລັງ login ຢູ່ເປັນຄົນດຽວກັນ
+                                if(currentUser && currentUser.username === targetUsername) {
+                                    currentUser.credit = newCredit;
+                                    localStorage.setItem('bb2_currentUser', JSON.stringify(currentUser));
+                                    updateAuthUI();
+                                }
+                            });
+                        }
+                    }
+                    showAlert("ອະນຸມັດສຳເລັດ! ເພີ່ມເຄຣດິດໃຫ້ " + targetUsername + " " + amount + " ₭ ແລ້ວ");
+                } else {
+                    // ຖ້າປະຕິເສດ ໃຫ້ລຶບອອກຈາກລາຍການ
+                    await window.deleteDoc(window.doc(window.db, "slips", id));
+                    showAlert("ປະຕິເສດ ແລະ ລຶບລາຍການແລ້ວ");
+                }
+                loadAdminSlips();
+            } catch(e) { showAlert("Error: " + e.message); }
+        }
+
+        async function adminPostAccount() {
+            const gameType = document.getElementById('adminGameType').value;
+            const title = document.getElementById('adminAccountTitle').value.trim();
+            const price = document.getElementById('adminAccountPrice').value.trim();
+            const imgFile = document.getElementById('adminAccountImgFile').files[0];
+
+            if (!title || !price || !imgFile) {
+                showAlert("ກະລຸນາໃສ່ຂໍ້ມູນ ແລະ ເລືອກຮູບໃຫ້ຄົບຖ້ວນ!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(imgFile);
+            reader.onload = async function () {
+                try {
+                    await window.addDoc(window.collection(window.db, "accounts"), {
+                        gameType: gameType,
+                        title: title,
+                        price: Number(price),
+                        imgUrl: reader.result,
+                        createdAt: Date.now()
+                    });
+                    showAlert("ໂພສຂາຍໄອດີເກມສຳເລັດ!");
+                    document.getElementById('adminAccountTitle').value = '';
+                    document.getElementById('adminAccountPrice').value = '';
+                    document.getElementById('adminAccountImgFile').value = '';
+                    loadMarketAccounts();
+                } catch(e) { showAlert("Error: " + e.message); }
+            };
+        }
+
+        async function loadMarketAccounts() {
+            const container = document.getElementById('market-account-list');
+            if(!container) return;
+            container.innerHTML = "";
+            try {
+                const snap = await window.getDocs(window.collection(window.db, "accounts"));
+                if(snap.empty) {
+                    container.innerHTML = `
+                        <div class="bg-[#1a1c23] rounded-2xl p-6 border border-gray-800 text-center space-y-2 shadow-xl col-span-full">
+                            <div class="text-3xl">📭</div>
+                            <p class="text-sm font-bold text-gray-300">ຕອນນີ້ຍັງບໍ່ມີສິນຄ້າເຂົ້າ</p>
+                            <p class="text-xs text-gray-500">ກະລຸນາຕິດຕາມກວດສອບໃໝ່ພາຍຫຼັງ</p>
+                        </div>
+                    `;
+                    return;
+                }
+                snap.forEach(d => {
+                    let item = d.data();
+                    container.innerHTML += `
+                        <div class="bg-[#1a1c23] border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between">
+                            <img src="${item.imgUrl}" alt="Account Image" class="w-full h-36 object-cover" onerror="this.src='https://via.placeholder.com/150/1e293b/ffffff?text=BB2'">
+                            <div class="p-4 space-y-2">
+                                <span class="bg-red-600/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded">${item.gameType}</span>
+                                <h3 class="font-bold text-sm text-white">${item.title}</h3>
+                                <p class="text-emerald-400 font-bold text-sm">${item.price.toLocaleString()} ₭</p>
+                                <button onclick="showAlert('ຕິດຕໍ່ຊື້ໄອດີນີ້ໄດ້ທີ່ເບີແອດມິນ: 2098203465')" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-xl transition">ຊື້ໄອດີນີ້</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) {}
+        }
+
+        async function loadHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            try {
+                const snap = await window.getDocs(window.collection(window.db, "orders"));
+                snap.forEach(d => {
+                    let o = d.data();
+                    tbody.innerHTML += `
+                        <tr class="border-b border-gray-800/60">
+                            <td class="py-2 px-2"><span class="text-yellow-500">${o.status}</span></td>
+                            <td class="py-2 px-2">${o.gameId}</td>
+                            <td class="py-2 px-2">${o.product}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) {}
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('bb2_currentUser');
+            updateAuthUI();
+            switchTab('home');
+            showAlert("ອອກຈາກລະບົບແລ້ວ");
+        }
+
+        function updateAuthUI() {
+            const guestAuthBtns = document.getElementById('guest-auth-buttons');
+            const authContainer = document.getElementById('user-auth-container');
+            const adminBtn = document.getElementById('admin-panel-btn');
+
+            if (currentUser) {
+                if(guestAuthBtns) guestAuthBtns.classList.add('hidden');
+                if(authContainer) authContainer.classList.remove('hidden');
+                document.getElementById('user-credit').innerText = (currentUser.credit || 0).toLocaleString() + " ₭";
+                document.getElementById('profile-page-handle').innerText = '@' + currentUser.username;
+                document.getElementById('profile-email-val').innerText = currentUser.email || 'user@bb2.com';
+                document.getElementById('profile-credit-val').innerText = (currentUser.credit || 0).toLocaleString() + " ₭";
+                if(adminBtn) adminBtn.classList.remove('hidden');
+            } else {
+                if(guestAuthBtns) guestAuthBtns.classList.remove('hidden');
+                if(authContainer) authContainer.classList.add('hidden');
+            }
+        }
+
+        function selectPackage(element, packageName) {
+            document.querySelectorAll('#topupView .package-card').forEach(el => {
+                el.classList.remove('border-red-500', 'bg-[#252833]/80');
+                el.classList.add('border-gray-700', 'bg-[#252833]');
+            });
+            element.classList.remove('border-gray-700', 'bg-[#252833]');
+            element.classList.add('border-red-500', 'bg-[#252833]/80');
+            selectedPackageName = packageName;
+        }
+
+        async function validateAndSubmitTopup() {
+            const gameId = document.getElementById('game-id').value.trim();
+            if (!gameId || gameId.length < 5 || !selectedPackageName) {
+                showAlert("ກະລຸນາໃສ່ໄອດີ່ເກມ ແລະ ເລືອກແພັກເກັດໃຫ້ຮຽບຮ້ອຍ");
+            } else {
+                try {
+                    await window.addDoc(window.collection(window.db, "orders"), {
+                        username: currentUser ? currentUser.username : 'guest',
+                        gameId: gameId,
+                        product: selectedPackageName,
+                        status: 'ລໍຖ້າກວດສອບ',
+                        createdAt: Date.now()
+                    });
+                    showAlert("ສັ່ງຊື້ສຳເລັດ! ດຳເນີນການເຕີມເກມໃຫ້ " + gameId, () => {
+                        switchTab('history');
+                    });
+                } catch(e) { showAlert("Error: " + e.message); }
+            }
+        }
+
+        function handleProfileClick() {
+            if (currentUser) { switchTab('profile'); }
+            else { openLoginModal(); }
+        }
+
+        function showAlert(msg, callback = null) {
+            document.getElementById('alert-message').innerText = msg;
+            alertCallback = callback;
+            document.getElementById('alertModal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+            if (alertCallback) {
+                alertCallback();
+                alertCallback = null;
+            }
+        }
+    </script>
+</body>
+</html>
